@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Controller</title>
+</head>
+<body>
+    <h1>ESP32 Web Control Interface</h1>
+    <button onclick="controlLED('on')">Turn LED ON</button>
+    <button onclick="controlLED('off')">Turn LED OFF</button>
+    <div>
+        <h2>Sensor Data:</h2>
+        <p id="sensorData">No data</p>
+        <button onclick="fetchSensorData()">Fetch Sensor Data</button>
+    </div>
+    <script>
+        function controlLED(state) {
+            fetch(`/esp32/led/${state}`).then(response => {
+                console.log(`LED ${state}`);
+            }).catch(console.error);
+        }
+
+        function fetchSensorData() {
+            fetch('/esp32/sensor/data').then(response => response.json()).then(data => {
+                document.getElementById('sensorData').textContent = `Temperature: ${data.temperature}`;
+            }).catch(console.error);
+        }
+    </script>
+</body>
+</html>

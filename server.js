@@ -30,10 +30,12 @@ app.use('/api', sensorDataRoutes);
 
 // Define routes for ESP32 control
 app.get('/esp32/led/on', (req, res) => {
-  res.send('LED turned on'); // Replace with actual control code
+  digitalWrite(ledPin, HIGH); // Turn the LED ON
+  res.send('LED is ON');
 });
 app.get('/esp32/led/off', (req, res) => {
-  res.send('LED turned off'); // Replace with actual control code
+  digitalWrite(ledPin, LOW); // Turn the LED OFF
+  res.send('LED is OFF');
 });
 app.get('/esp32/sensor/data', (req, res) => {
   res.json({ temperature: 22 }); // Mock sensor data; replace with actual sensor data retrieval

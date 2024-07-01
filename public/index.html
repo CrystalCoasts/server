@@ -16,13 +16,13 @@
     </div>
     <script>
         function controlLED(state) {
-            fetch(`/esp32/led/${state}`).then(response => {
+            fetch(`http://172.20.10.2/led/${state}`).then(response => {
                 console.log(`LED ${state}`);
             }).catch(console.error);
         }
 
         function fetchSensorData() {
-            fetch('/esp32/sensor/data').then(response => response.json()).then(data => {
+            fetch('http://172.20.10.2/esp32/data').then(response => response.json()).then(data => {
                 document.getElementById('sensorData').textContent = `Temperature: ${data.temperature}`;
             }).catch(console.error);
         }

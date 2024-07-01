@@ -1,10 +1,10 @@
 require('dotenv').config();
-
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
 
 const sensorDataRoutes = require('./routes/sensorData');
 
@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -28,17 +28,34 @@ mongoose.connection.once('open', () => {
 // Use the sensor data routes
 app.use('/api', sensorDataRoutes);
 
-// Define routes for ESP32 control
-app.get('/esp32/led/on', (req, res) => {
-  digitalWrite(ledPin, HIGH); // Turn the LED ON
-  res.send('LED is ON');
+// Proxy routes for ESP32
+const esp32BaseUrl = 'http://esp32.local';
+
+app.get('/esp32/led/on', async (req, res) => {
+  try {
+    const response = await axios.get(`${esp32BaseUrl}/led/on`);
+    res.send(response.data);
+  } catch (error) {
+    res.status(500).send('Error communicating with ESP32');
+  }
 });
-app.get('/esp32/led/off', (req, res) => {
-  digitalWrite(ledPin, LOW); // Turn the LED OFF
-  res.send('LED is OFF');
+
+app.get('/esp32/led/off', async (req, res) => {
+  try {
+    const response = await axios.get(`${esp32BaseUrl}/led/off`);
+    res.send(response.data);
+  } catch (error) {
+    res.status(500).send('Error communicating with ESP32');
+  }
 });
-app.get('/esp32/sensor/data', (req, res) => {
-  res.json({ temperature: 22 }); // Mock sensor data; replace with actual sensor data retrieval
+
+app.get('/esp32/fetch', async (req, res) => {
+  try {
+    const response = await axios.get(`${esp32BaseUrl}/fetch`);
+    res.send(response.data);
+  } catch (error) {
+    res.status(500).send('Error communicating with ESP32');
+  }
 });
 
 // Base route

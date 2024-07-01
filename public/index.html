@@ -15,15 +15,17 @@
         <button onclick="fetchSensorData()">Fetch Sensor Data</button>
     </div>
     <script>
+        const serverUrl = 'https://smart-seawall-server.herokuapp.com'; // Replace with your Heroku app URL, e.g., 'https://smart-seawall-server.herokuapp.com'
+
         function controlLED(state) {
-            fetch(`http://172.20.10.2/led/${state}`).then(response => {
+            fetch(`${serverUrl}/esp32/led/${state}`).then(response => {
                 console.log(`LED ${state}`);
             }).catch(console.error);
         }
 
         function fetchSensorData() {
-            fetch('http://172.20.10.2/esp32/data').then(response => response.json()).then(data => {
-                document.getElementById('sensorData').textContent = `Temperature: ${data.temperature}`;
+            fetch(`${serverUrl}/esp32/fetch`).then(response => response.json()).then(data => {
+                document.getElementById('sensorData').textContent = `Sensor Value: ${data}`;
             }).catch(console.error);
         }
     </script>

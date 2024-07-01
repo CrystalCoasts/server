@@ -15,7 +15,7 @@
         <button onclick="fetchSensorData()">Fetch Sensor Data</button>
     </div>
     <script>
-        const serverUrl = 'https://smart-seawall-server.herokuapp.com'; // Replace with your Heroku app URL, e.g., 'https://smart-seawall-server.herokuapp.com'
+        const serverUrl = 'https://smart-seawall-server-staging-b61a03b529a6.herokuapp.com/'; // Replace with your Heroku app URL, e.g., 'https://smart-seawall-server.herokuapp.com'
 
         function controlLED(state) {
             fetch(`${serverUrl}/esp32/led/${state}`).then(response => {

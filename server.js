@@ -29,7 +29,7 @@ mongoose.connection.once('open', () => {
 app.use('/api', sensorDataRoutes);
 
 // Proxy routes for ESP32
-const esp32BaseUrl = 'http://esp32.local';
+const esp32BaseUrl = 'http://esp32.local'; // mDNS name
 
 app.get('/esp32/led/on', async (req, res) => {
   try {

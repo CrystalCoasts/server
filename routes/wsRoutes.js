@@ -7,7 +7,14 @@ const { turnOnLed, turnOffLed, fetchSensorData } = require('../handlers/esp32Han
 router.ws('/', (ws, req) => {
   ws.on('message', function(msg) {
     console.log('Received message:', msg);
-    const message = JSON.parse(msg);
+    let message;
+    try {
+      message = JSON.parse(msg);
+    } catch (e) {
+      console.error('Error parsing JSON:', e);
+      ws.send(JSON.stringify({ error: 'Invalid JSON' }));
+      return;
+    }
 
     switch (message.type) {
       case 'turnOnLed':

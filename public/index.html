@@ -3,45 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP32 Controller</title>
+    <title>Control Interface</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const socket = io('https://smart-seawall-server-staging-b61a03b529a6.herokuapp.com/');
+
+        function controlLED(action) {
+            socket.emit(action);
+        }
+
+        socket.on('controlLed', (data) => {
+            console.log('LED Control:', data.control);
+        });
+    </script>
 </head>
-<body>  
-    <h1> Using ws</h1>
+<body>
     <h1>ESP32 Web Control Interface</h1>
-    <button onclick="controlLED('on')">Turn LED ON</button>
-    <button onclick="controlLED('off')">Turn LED OFF</button>
+    <button onclick="controlLED('turnOnLed')">Turn LED ON</button>
+    <button onclick="controlLED('turnOffLed')">Turn LED OFF</button>
     <div>
         <h2>Sensor Data:</h2>
         <p id="sensorData">No data</p>
-        <button onclick="fetchSensorData()">Fetch Sensor Data</button>
     </div>
-    <script>
-        const ws = new WebSocket('wss://smart-seawall-server-staging-b61a03b529a6.herokuapp.com/ws/');
-
-        ws.onopen = function() {
-            console.log('WebSocket connection established');
-        };
-
-        ws.onerror = function(error) {
-            console.log('WebSocket Error: ' + error);
-        };
-
-        ws.onmessage = function(e) {
-            console.log('Received: ' + e.data);
-            document.getElementById('sensorData').textContent = `Sensor Value: ${e.data}`;
-        };
-
-        function controlLED(state) {
-            if(ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: state === 'on' ? 'turnOnLed' : 'turnOffLed' }));
-            }
-        }
-
-        function fetchSensorData() {
-            if(ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'fetchSensorData' }));
-            }
-        }
-    </script>
 </body>
 </html>

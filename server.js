@@ -10,7 +10,8 @@ wss.on('connection', function connection(ws) {
     console.log('A client connected');
 
     ws.on('message', function incoming(message) {
-        console.log('received: %s', message);
+        console.log('Received from ESP32: %s', message);
+        ws.send(`Received your message: ${message}`); // Echo back the received message
     });
 
     ws.send('Hello from server');

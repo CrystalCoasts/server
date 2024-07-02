@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const WebSocket = require('ws');
 
 const app = express();
@@ -7,6 +8,9 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 let clients = [];
+
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 wss.on('connection', function connection(ws) {
     clients.push(ws);
@@ -27,11 +31,13 @@ wss.on('connection', function connection(ws) {
         console.log('A client disconnected');
     });
 
+    // Send a greeting message when a client connects
     ws.send('Hello from server');
 });
 
+// Ensure the index.html is served at the base route
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;

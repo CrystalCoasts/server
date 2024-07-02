@@ -3,27 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Interface</title>
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <title>ESP32 Controller</title>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io('https://smart-seawall-server-staging-b61a03b529a6.herokuapp.com/');
+        const socket = io();
+
+        socket.on('connect', function() {
+            console.log('Connected to server');
+        });
+
+        socket.on('controlLed', function(data) {
+            if(data.action === 'on') {
+                console.log('LED should turn ON');
+            } else {
+                console.log('LED should turn OFF');
+            }
+        });
 
         function controlLED(action) {
             socket.emit(action);
         }
-
-        socket.on('controlLed', (data) => {
-            console.log('LED Control:', data.control);
-        });
     </script>
 </head>
 <body>
     <h1>ESP32 Web Control Interface</h1>
     <button onclick="controlLED('turnOnLed')">Turn LED ON</button>
     <button onclick="controlLED('turnOffLed')">Turn LED OFF</button>
-    <div>
-        <h2>Sensor Data:</h2>
-        <p id="sensorData">No data</p>
-    </div>
 </body>
 </html>

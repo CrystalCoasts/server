@@ -13,27 +13,32 @@ router.ws('/', (ws, req) => {
     } catch (e) {
       console.error('Error parsing JSON:', e);
       ws.send(JSON.stringify({ error: 'Invalid JSON' }));
-      return; // Do not send an error response
+      return;
     }
 
     if (message.type) {
       switch (message.type) {
         case 'turnOnLed':
           turnOnLed(ws);
+          console.log('Sending command to ESP32: turnOnLed');
           ws.send(JSON.stringify({ type: 'turnOnLed' }));
           break;
         case 'turnOffLed':
           turnOffLed(ws);
+          console.log('Sending command to ESP32: turnOffLed');
           ws.send(JSON.stringify({ type: 'turnOffLed' }));
           break;
         case 'fetchSensorData':
           fetchSensorData(ws);
+          console.log('Sending command to ESP32: fetchSensorData');
           ws.send(JSON.stringify({ type: 'fetchSensorData' }));
           break;
         default:
+          console.log('Sending error to ESP32: Unknown command');
           ws.send(JSON.stringify({ error: 'Unknown command' }));
       }
     } else {
+      console.log('Sending error to ESP32: Missing type');
       ws.send(JSON.stringify({ error: 'Unknown command' }));
     }
   });

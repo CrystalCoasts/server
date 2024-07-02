@@ -15,18 +15,31 @@
         <button onclick="fetchSensorData()">Fetch Sensor Data</button>
     </div>
     <script>
-        const serverUrl = 'https://smart-seawall-server-staging-b61a03b529a6.herokuapp.com/'; // Replace with your Heroku app URL, e.g., 'https://smart-seawall-server.herokuapp.com'
+        const ws = new WebSocket('wss://smart-seawall-server-staging-b61a03b529a6.herokuapp.com/ws/');
+
+        ws.onopen = function() {
+            console.log('WebSocket connection established');
+        };
+
+        ws.onerror = function(error) {
+            console.log('WebSocket Error: ' + error);
+        };
+
+        ws.onmessage = function(e) {
+            console.log('Received: ' + e.data);
+            document.getElementById('sensorData').textContent = `Sensor Value: ${e.data}`;
+        };
 
         function controlLED(state) {
-            fetch(`${serverUrl}/esp32/led/${state}`).then(response => {
-                console.log(`LED ${state}`);
-            }).catch(console.error);
+            if(ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: state === 'on' ? 'turnOnLed' : 'turnOffLed' }));
+            }
         }
 
         function fetchSensorData() {
-            fetch(`${serverUrl}/esp32/fetch`).then(response => response.json()).then(data => {
-                document.getElementById('sensorData').textContent = `Sensor Value: ${data}`;
-            }).catch(console.error);
+            if(ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'fetchSensorData' }));
+            }
         }
     </script>
 </body>

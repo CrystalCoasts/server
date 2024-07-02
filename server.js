@@ -4,11 +4,14 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-const axios = require('axios');
+const expressWs = require('express-ws');
 
 const sensorDataRoutes = require('./routes/sensorData');
+const wsRoutes = require('./routes/wsRoutes');
 
 const app = express();
+expressWs(app);  // This applies WebSocket functionality to Express app
+
 const PORT = process.env.PORT || 3000;
 
 // Middleware
@@ -20,43 +23,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
-mongoose.connection.once('open', () => {
+}).then(() => {
   console.log('Connected to MongoDB');
+}).catch(err => {
+  console.error('Error connecting to MongoDB:', err.message);
 });
 
-// Use the sensor data routes
+// Routes
 app.use('/api', sensorDataRoutes);
-
-// Proxy routes for ESP32
-const esp32BaseUrl = 'http://esp32.local'; // mDNS name
-
-app.get('/esp32/led/on', async (req, res) => {
-  try {
-    const response = await axios.get(`${esp32BaseUrl}/led/on`);
-    res.send(response.data);
-  } catch (error) {
-    res.status(500).send('Error communicating with ESP32');
-  }
-});
-
-app.get('/esp32/led/off', async (req, res) => {
-  try {
-    const response = await axios.get(`${esp32BaseUrl}/led/off`);
-    res.send(response.data);
-  } catch (error) {
-    res.status(500).send('Error communicating with ESP32');
-  }
-});
-
-app.get('/esp32/fetch', async (req, res) => {
-  try {
-    const response = await axios.get(`${esp32BaseUrl}/fetch`);
-    res.send(response.data);
-  } catch (error) {
-    res.status(500).send('Error communicating with ESP32');
-  }
-});
+app.use('/ws', wsRoutes);  // WebSocket route for ESP32 interactions
 
 // Base route
 app.get('/', (req, res) => {
@@ -65,5 +40,5 @@ app.get('/', (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

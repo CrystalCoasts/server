@@ -1,5 +1,5 @@
-require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const http = require('http');
 const socketIo = require('socket.io');
 
@@ -9,33 +9,22 @@ const io = socketIo(server);
 
 const PORT = process.env.PORT || 3000;
 
-// Serve a simple test page
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
+// Middleware to serve static files from 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Handle socket connection
 io.on('connection', (socket) => {
-  console.log('A user connected');
+    console.log('A user connected');
 
-  // Example endpoints to control the LED from external API calls
-  app.get('/led/on', (req, res) => {
-    socket.emit('controlLed', 'turnOnLed');
-    res.send('LED On command sent');
-  });
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
 
-  app.get('/led/off', (req, res) => {
-    socket.emit('controlLed', 'turnOffLed');
-    res.send('LED Off command sent');
-  });
-
-  // Handle disconnection
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
+    // Emitting events to the client
+    socket.emit('greeting', 'Hello from the server!');
 });
 
 // Start the server
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

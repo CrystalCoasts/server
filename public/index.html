@@ -4,29 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESP32 Controller</title>
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const socket = io(); // Connect to the server
-
-            socket.on('connect', () => {
-                console.log('Connected to server');
-            });
-
-            // Function to send commands to turn the LED on or off
-            function controlLED(command) {
-                socket.emit('controlLed', command);
-                console.log('Command sent:', command);
-            }
-
-            document.getElementById('turnOn').addEventListener('click', () => controlLED('turnOnLed'));
-            document.getElementById('turnOff').addEventListener('click', () => controlLED('turnOffLed'));
-        });
-    </script>
 </head>
 <body>
     <h1>ESP32 Web Control Interface</h1>
-    <button id="turnOn">Turn LED ON</button>
-    <button id="turnOff">Turn LED OFF</button>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const socket = io(); // This connects to your server using the current URL
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('greeting', (message) => {
+            console.log(message);  // Expected to log 'Hello from the server!'
+        });
+    </script>
 </body>
 </html>

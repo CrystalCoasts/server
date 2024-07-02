@@ -14,14 +14,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Handle socket connection
 io.on('connection', (socket) => {
-    console.log('A user connected');
+  console.log('A user connected');
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
-    });
+  socket.on('disconnect', (reason) => {
+    console.log(`User disconnected due to ${reason}`);
+  });
 
-    // Emitting events to the client
-    socket.emit('greeting', 'Hello from the server!');
+  socket.on('error', (error) => {
+    console.error('Socket error:', error);
+  });
 });
 
 // Start the server

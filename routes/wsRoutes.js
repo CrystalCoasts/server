@@ -13,21 +13,28 @@ router.ws('/', (ws, req) => {
     } catch (e) {
       console.error('Error parsing JSON:', e);
       ws.send(JSON.stringify({ error: 'Invalid JSON' }));
-      return;
+      return; // Do not send an error response
     }
 
-    switch (message.type) {
-      case 'turnOnLed':
-        turnOnLed(ws);
-        break;
-      case 'turnOffLed':
-        turnOffLed(ws);
-        break;
-      case 'fetchSensorData':
-        fetchSensorData(ws);
-        break;
-      default:
-        ws.send(JSON.stringify({ error: 'Unknown command' }));
+    if (message.type) {
+      switch (message.type) {
+        case 'turnOnLed':
+          turnOnLed(ws);
+          ws.send(JSON.stringify({ type: 'turnOnLed' }));
+          break;
+        case 'turnOffLed':
+          turnOffLed(ws);
+          ws.send(JSON.stringify({ type: 'turnOffLed' }));
+          break;
+        case 'fetchSensorData':
+          fetchSensorData(ws);
+          ws.send(JSON.stringify({ type: 'fetchSensorData' }));
+          break;
+        default:
+          ws.send(JSON.stringify({ error: 'Unknown command' }));
+      }
+    } else {
+      ws.send(JSON.stringify({ error: 'Unknown command' }));
     }
   });
 

@@ -23,6 +23,11 @@ io.on('connection', (socket) => {
   socket.on('error', (error) => {
     console.error('Socket error:', error);
   });
+
+  socket.on('ping', () => {
+    socket.emit('pong');
+  });
+  
 });
 
 // Start the server

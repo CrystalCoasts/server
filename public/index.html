@@ -1,23 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP32 Controller</title>
-</head>
-<body>
-    <h1>ESP32 Web Control Interface</h1>
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <script>
-        const socket = io(); // This connects to your server using the current URL
+var app = require('express')();
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
 
-        socket.on('connect', () => {
-            console.log('Connected to server');
-        });
+app.get('/', function (req, res) {
+    res.send('<h1>Hello world</h1>');
+});
 
-        socket.on('greeting', (message) => {
-            console.log(message);  // Expected to log 'Hello from the server!'
-        });
-    </script>
-</body>
-</html>
+// When the server receives a post request on /sendData
+app.post('/sendData', function (req, res) {
+
+    //send data to sockets.
+    io.sockets.emit('event', { message: "Hello from server!" })
+    
+    res.send({});
+});
+
+// When a new connection is requested
+io.on('connection', function (socket) {
+    console.log('User Connected!');
+
+    // Send to the connected user
+    socket.emit('event', { message: 'Connected !!!!' });
+    
+    // On each "status", run this function
+    socket.on('status', function (data) {
+        console.log(data);
+    });
+});
+
+// Listen to port 3000
+http.listen(3000, function () {
+    console.log('listening on *:3000');
+});

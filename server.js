@@ -1,45 +1,26 @@
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
+const WebSocket = require('ws');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const wss = new WebSocket.Server({ server });
 
-// Handle CORS if necessary
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+wss.on('connection', function connection(ws) {
+    console.log('A client connected');
 
-// Serve your front-end or send a basic response
-app.get('/', function (req, res) {
-    res.send('<h1>Hello world</h1>');
-});
-
-// Endpoint to receive data from ESP32
-app.post('/sendData', function (req, res) {
-    // Example: emit to all connected sockets
-    io.sockets.emit('event', { message: "Hello from server!" });
-    res.send({});
-});
-
-// Socket.IO connection handling
-io.on('connection', function (socket) {
-    console.log('User Connected!');
-
-    // Example: send a message to the connected client
-    socket.emit('event', { message: 'Connected !!!!' });
-
-    // Example: handle incoming 'status' events from client
-    socket.on('status', function (data) {
-        console.log(data);
+    ws.on('message', function incoming(message) {
+        console.log('received: %s', message);
     });
+
+    ws.send('Hello from server');
 });
 
-// Start the server listening on port 3000
+app.get('/', (req, res) => {
+    res.send('WebSocket server is running');
+});
+
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, function () {
-    console.log(`Server listening on port ${PORT}`);
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });

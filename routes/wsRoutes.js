@@ -13,7 +13,7 @@ router.ws('/', (ws, req) => {
     } catch (e) {
       console.error('Error parsing JSON:', e);
       ws.send(JSON.stringify({ error: 'Invalid JSON' }));
-      return;
+      return; // Do not send an error response
     }
 
     if (message.type) {

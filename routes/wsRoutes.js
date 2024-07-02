@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const expressWs = require('express-ws')(router);
+
 const { turnOnLed, turnOffLed, fetchSensorData } = require('../handlers/esp32Handlers');
 
-// Setup WebSocket route
 router.ws('/', (ws, req) => {
   ws.on('message', function(msg) {
     console.log('Received message:', msg);
     const message = JSON.parse(msg);
-    
+
     switch (message.type) {
       case 'turnOnLed':
         turnOnLed(ws);

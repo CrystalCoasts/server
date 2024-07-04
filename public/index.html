@@ -6,7 +6,8 @@
     <title>ESP32 Communication Interface</title>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const socket = new WebSocket('wss://' + window.location.host); // Connect using WebSocket
+            const socket = new WebSocket('wss://' + window.location.host + '/?clientType=webapp');
+
 
             socket.addEventListener('open', function() {
                 console.log('Connected to server');

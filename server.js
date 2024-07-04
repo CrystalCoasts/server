@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const WebSocket = require('ws');
+const url = require('url');  // Make sure to include this for URL parsing
 
 const app = express();
 const server = http.createServer(app);
@@ -12,27 +13,37 @@ let clients = [];
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-wss.on('connection', function connection(ws) {
-    clients.push(ws);
-    console.log('A client connected');
+wss.on('connection', function connection(ws, req) {
+  try {
+      const location = url.parse(req.url, true);
+      const clientType = location.query.clientType || 'unknown';
 
-    ws.on('message', function incoming(message) {
-        console.log('Received: %s', message);
-        // Broadcast message to all clients
-        clients.forEach(client => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
-        });
-    });
+      console.log(`A client connected: ${clientType}`);
 
-    ws.on('close', () => {
-        clients = clients.filter(client => client !== ws);
-        console.log('A client disconnected');
-    });
+      ws.on('message', function incoming(message) {
+          console.log(`Received from ${clientType}: ${message}`);
+          // Broadcast message to all clients
+          clients.forEach(client => {
+              if (client !== ws && client.readyState === WebSocket.OPEN) {
+                  client.send(`From ${clientType}: ${message}`);
+              }
+          });
+      });
 
-    // Send a greeting message when a client connects
-    ws.send('Hello from server');
+      ws.on('close', () => {
+          clients = clients.filter(client => client !== ws);
+          console.log(`A client disconnected: ${clientType}`);
+      });
+
+      ws.on('error', error => {
+          console.error(`WebSocket error from ${clientType}:`, error);
+      });
+
+      ws.send(`Hello from server to ${clientType}`);
+  } catch (error) {
+      console.error('Failed to handle a connection:', error);
+      ws.close(); // Close the connection if an error occurs during setup
+  }
 });
 
 // Ensure the index.html is served at the base route

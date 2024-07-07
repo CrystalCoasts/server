@@ -18,6 +18,7 @@ wss.on('connection', function connection(ws, req) {
       const location = url.parse(req.url, true);
       const clientType = location.query.clientType || 'unknown';
 
+      clients.push(ws);
       console.log(`A client connected: ${clientType}`);
 
       ws.on('message', function incoming(message) {

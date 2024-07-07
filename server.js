@@ -26,7 +26,8 @@ wss.on('connection', function connection(ws, req) {
           // Broadcast message to all clients
           clients.forEach(client => {
               if (client !== ws && client.readyState === WebSocket.OPEN) {
-                  client.send(`From ${clientType}: ${message}`);
+                  // client.send(`From ${clientType}: ${message}`);
+                  client.send(`${message}`);
               }
           });
       });

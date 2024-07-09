@@ -20,7 +20,7 @@ wss.on('connection', function connection(ws, req) {
 
       clients.push(ws);
       console.log(`A client connected: ${clientType}`);
-
+      console.log(`Total clients connected: ${clients.length}`); // Log the total number of clients connected
       ws.on('message', function incoming(message) {
           console.log(`Received from ${clientType}: ${message}`);
           // Broadcast message to all clients

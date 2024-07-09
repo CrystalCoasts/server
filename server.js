@@ -9,6 +9,8 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 let clients = [];
+let webClients = 0;
+let esp32Clients = 0;
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -21,6 +23,17 @@ wss.on('connection', function connection(ws, req) {
       clients.push(ws);
       console.log(`A client connected: ${clientType}`);
       console.log(`Total clients connected: ${clients.length}`); // Log the total number of clients connected
+      for (let i = 0; i < clients.length; i++) {
+        if (clients[i].clientType === 'webapp') {
+          webClients++;
+        } else if (clients[i].clientType === 'esp32') { 
+          esp32Clients++;
+        }
+      }
+
+        console.log(`Total webapp clients connected: ${webClients}`);
+        console.log(`Total esp32 clients connected: ${esp32Clients}`);
+
       ws.on('message', function incoming(message) {
           console.log(`Received from ${clientType}: ${message}`);
           // Broadcast message to all clients

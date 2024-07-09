@@ -22,12 +22,26 @@ wss.on('connection', function connection(ws, req) {
 
     ws.on('message', function incoming(message) {
         console.log(`Received from ${ws.clientType}: ${message}`);
+    
+        // Check if the message is from a webapp and if there are any connected ESP32 clients
+        if (ws.clientType === 'webapp') {
+            const esp32Connected = clients.some(client => client.clientType === 'esp32' && client.readyState === WebSocket.OPEN);
+    
+            if (!esp32Connected) {
+                console.log('No ESP32 clients connected.');
+                ws.send('ESP32 not connected.');
+                return;  // Stop further processing if no ESP32 clients are connected
+            }
+        }
+    
+        // Broadcast message to all clients except the sender
         clients.forEach(client => {
             if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(message);
             }
         });
     });
+    
 
     ws.on('close', () => {
         clients = clients.filter(client => client !== ws);

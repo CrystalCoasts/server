@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESP32 Communication Interface</title>
+</head>
+<body>
+    <h1>Web Client for ESP32 Communication</h1>
+    <p>Status: <span id="status">Disconnected</span></p>
+    <button id="readSensorsBtn">Read Sensors</button>
+    <button id="readBatteryBtn">Read Battery</button>
+    <button id="scheduleWakeUpBtn">Schedule Next Wake Up</button>
+    <p>Messages: <span id="messages"></span></p>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const socket = new WebSocket('wss://' + window.location.host + '/?clientType=webapp');
-
 
             socket.addEventListener('open', function() {
                 console.log('Connected to server');
@@ -24,19 +32,19 @@
                 document.getElementById('status').textContent = 'Disconnected';
             });
 
-            document.getElementById('sendButton').addEventListener('click', function() {
-                const message = document.getElementById('messageInput').value;
-                socket.send(message);
-                document.getElementById('messageInput').value = '';  // Clear input after sending
+            // Event listeners for buttons
+            document.getElementById('readSensorsBtn').addEventListener('click', function() {
+                socket.send('read sensors');
+            });
+
+            document.getElementById('readBatteryBtn').addEventListener('click', function() {
+                socket.send('read bat');
+            });
+
+            document.getElementById('scheduleWakeUpBtn').addEventListener('click', function() {
+                socket.send('updt');
             });
         });
     </script>
-</head>
-<body>
-    <h1>Web Client for ESP32 Communication</h1>
-    <p>Status: <span id="status">Disconnected</span></p>
-    <input id="messageInput" type="text" placeholder="Type a message...">
-    <button id="sendButton">Send</button>
-    <p>Messages: <span id="messages"></span></p>
 </body>
 </html>

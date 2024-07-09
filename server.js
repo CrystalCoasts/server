@@ -2,74 +2,17 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const url = require('url');
+const setupWebSocket = require('./wsRoutes');
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-let clients = [];
-
+// Serve static files from 'public' directory
 app.use(express.static('public'));
 
-wss.on('connection', function connection(ws, req) {
-    const location = url.parse(req.url, true);
-    ws.clientType = location.query.clientType || 'unknown';  // Store client type in the WebSocket object
-
-    clients.push(ws);
-    console.log(`A client connected: ${ws.clientType}`);
-    
-    updateClientCounts();  // Update and log client counts
-
-    ws.on('message', function incoming(message) {
-        console.log(`Received from ${ws.clientType}: ${message}`);
-    
-        // Check if the message is from a webapp and if there are any connected ESP32 clients
-        if (ws.clientType === 'webapp') {
-            const esp32Connected = clients.some(client => client.clientType === 'esp32' && client.readyState === WebSocket.OPEN);
-    
-            if (!esp32Connected) {
-                console.log('No ESP32 clients connected.');
-                ws.send('ESP32 not connected.');
-                return;  // Stop further processing if no ESP32 clients are connected
-            }
-        }
-    
-        // Broadcast message to all clients except the sender
-        clients.forEach(client => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
-        });
-    });
-    
-
-    ws.on('close', () => {
-        clients = clients.filter(client => client !== ws);
-        console.log(`A client disconnected: ${ws.clientType}`);
-        updateClientCounts();  // Update counts on disconnect as well
-    });
-
-    ws.on('error', error => {
-        console.error(`WebSocket error from ${ws.clientType}:`, error);
-    });
-
-    ws.send(`Hello from server to ${ws.clientType}`);
-});
-
-function updateClientCounts() {
-    let webClients = 0;
-    let esp32Clients = 0;
-    clients.forEach(client => {
-        if (client.clientType === 'webapp') {
-            webClients++;
-        } else if (client.clientType === 'esp32') {
-            esp32Clients++;
-        }
-    });
-    console.log(`Total clients connected: ${clients.length}`);
-    console.log(`Total webapp clients connected: ${webClients}`);
-    console.log(`Total esp32 clients connected: ${esp32Clients}`);
-}
+// Initialize WebSocket routing
+setupWebSocket(wss);
 
 app.get('/', (req, res) => {
     res.sendFile('index.html', { root: __dirname });

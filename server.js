@@ -1,69 +1,64 @@
 const express = require('express');
 const http = require('http');
-const path = require('path');
 const WebSocket = require('ws');
-const url = require('url');  // Make sure to include this for URL parsing
+const url = require('url');
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 let clients = [];
-let webClients = 0;
-let esp32Clients = 0;
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 wss.on('connection', function connection(ws, req) {
-  try {
-      const location = url.parse(req.url, true);
-      const clientType = location.query.clientType || 'unknown';
+    const location = url.parse(req.url, true);
+    ws.clientType = location.query.clientType || 'unknown';  // Store client type in the WebSocket object
 
-      clients.push(ws);
-      console.log(`A client connected: ${clientType}`);
-      console.log(`Total clients connected: ${clients.length}`); // Log the total number of clients connected
-      for (let i = 0; i < clients.length; i++) {
-        if (clients[i].clientType === 'webapp') {
-          webClients++;
-        } else if (clients[i].clientType === 'esp32') { 
-          esp32Clients++;
-        }
-      }
+    clients.push(ws);
+    console.log(`A client connected: ${ws.clientType}`);
+    
+    updateClientCounts();  // Update and log client counts
 
-        console.log(`Total webapp clients connected: ${webClients}`);
-        console.log(`Total esp32 clients connected: ${esp32Clients}`);
+    ws.on('message', function incoming(message) {
+        console.log(`Received from ${ws.clientType}: ${message}`);
+        clients.forEach(client => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+    });
 
-      ws.on('message', function incoming(message) {
-          console.log(`Received from ${clientType}: ${message}`);
-          // Broadcast message to all clients
-          clients.forEach(client => {
-              if (client !== ws && client.readyState === WebSocket.OPEN) {
-                  // client.send(`From ${clientType}: ${message}`);
-                  client.send(`${message}`);
-              }
-          });
-      });
+    ws.on('close', () => {
+        clients = clients.filter(client => client !== ws);
+        console.log(`A client disconnected: ${ws.clientType}`);
+        updateClientCounts();  // Update counts on disconnect as well
+    });
 
-      ws.on('close', () => {
-          clients = clients.filter(client => client !== ws);
-          console.log(`A client disconnected: ${clientType}`);
-      });
+    ws.on('error', error => {
+        console.error(`WebSocket error from ${ws.clientType}:`, error);
+    });
 
-      ws.on('error', error => {
-          console.error(`WebSocket error from ${clientType}:`, error);
-      });
-
-      ws.send(`Hello from server to ${clientType}`);
-  } catch (error) {
-      console.error('Failed to handle a connection:', error);
-      ws.close(); // Close the connection if an error occurs during setup
-  }
+    ws.send(`Hello from server to ${ws.clientType}`);
 });
 
-// Ensure the index.html is served at the base route
+function updateClientCounts() {
+    let webClients = 0;
+    let esp32Clients = 0;
+    clients.forEach(client => {
+        if (client.clientType === 'webapp') {
+            webClients++;
+        } else if (client.clientType === 'esp32') {
+            esp32Clients++;
+        }
+    });
+    console.log(`Total clients connected: ${clients.length}`);
+    console.log(`Total webapp clients connected: ${webClients}`);
+    console.log(`Total esp32 clients connected: ${esp32Clients}`);
+}
+
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile('index.html', { root: __dirname });
 });
 
 const PORT = process.env.PORT || 3000;

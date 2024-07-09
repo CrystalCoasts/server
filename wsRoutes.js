@@ -1,11 +1,11 @@
-const url = require('url');
+const WebSocket = require('ws'); // This is necessary if you need WebSocket constants
 
 function setupWebSocket(wss) {
     let clients = [];
 
     wss.on('connection', function connection(ws, req) {
-        const location = url.parse(req.url, true);
-        ws.clientType = location.query.clientType || 'unknown';
+        const location = new URL(req.url, `http://${req.headers.host}`);
+        ws.clientType = location.searchParams.get('clientType') || 'unknown';
 
         clients.push(ws);
         console.log(`A client connected: ${ws.clientType}`);

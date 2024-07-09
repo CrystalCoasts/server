@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const url = require('url');
-const setupWebSocket = require('./wsRoutes');
+const setupWebSocket = require('./routes/wsRoutes');
 
 const app = express();
 const server = http.createServer(app);

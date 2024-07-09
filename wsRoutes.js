@@ -60,4 +60,8 @@ function handleMessage(ws, message, clients) {
     clients.forEach(client => {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
             client.send(message);
-       
+        }
+    });
+}
+
+module.exports = setupWebSocket;

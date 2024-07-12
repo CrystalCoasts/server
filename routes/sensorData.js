@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const SensorData = require('../models/SensorData');
+const TestSensorData = require('../models/testSensorData'); 
 
 // Route to get all sensor data
 router.get('/data', async (req, res) => {
@@ -35,7 +36,7 @@ router.post('/data', async (req, res) => {
 // Route to get all test sensor data
 router.get('/test-data', async (req, res) => {
   try {
-    const data = await TestSensorData.find();
+    const data = await SensorData.find();
     res.json(data);
   } catch (err) {
     res.status(500).json({ message: err.message });

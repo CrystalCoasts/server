@@ -44,8 +44,8 @@ router.post('/test-data', async (req, res) => {
   });
 
   try {
-    const newSensorData = await sensorData.save();
-    res.status(201).json(newSensorData);
+    const newTestsensorData = await testSensorData.save();
+    res.status(201).json(newTestsensorData);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

@@ -1,8 +1,8 @@
-// models/SensorData.js
+// models/TestSensorData.js
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const sensorDataSchema = new Schema({
+const testSensorDataSchema = new Schema({
   // timestamp: {
   //   type: Date,
   //   default: Date.now,
@@ -13,7 +13,6 @@ const sensorDataSchema = new Schema({
   temperature: Number,
   salinity: Number,
   tds: Number,
-  
 });
 
-module.exports = mongoose.model('SensorData', sensorDataSchema);
+module.exports = mongoose.model('TestSensorData', testSensorDataSchema);

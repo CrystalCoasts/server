@@ -32,9 +32,9 @@ router.post('/data', async (req, res) => {
   }
 });
 
-//test data routes
+// Route to add new test sensor data
 router.post('/test-data', async (req, res) => {
-  const testSensorData = new testSensorData({
+  const testSensorData = new TestSensorData({
     pH: req.body.pH,
     oxygenLevel: req.body.oxygenLevel,
     turbidity: req.body.turbidity,
@@ -44,12 +44,11 @@ router.post('/test-data', async (req, res) => {
   });
 
   try {
-    const newTestsensorData = await testSensorData.save();
-    res.status(201).json(newTestsensorData);
+    const newTestSensorData = await testSensorData.save();
+    res.status(201).json(newTestSensorData);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
-
 
 module.exports = router;

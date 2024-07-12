@@ -32,4 +32,24 @@ router.post('/data', async (req, res) => {
   }
 });
 
+//test data routes
+router.post('/test-data', async (req, res) => {
+  const testSensorData = new testSensorData({
+    pH: req.body.pH,
+    oxygenLevel: req.body.oxygenLevel,
+    turbidity: req.body.turbidity,
+    tds: req.body.tds,
+    temperature: req.body.temperature,
+    salinity: req.body.salinity,
+  });
+
+  try {
+    const newSensorData = await sensorData.save();
+    res.status(201).json(newSensorData);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+
 module.exports = router;

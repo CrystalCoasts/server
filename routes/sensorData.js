@@ -36,7 +36,7 @@ router.post('/data', async (req, res) => {
 // Route to get all test sensor data
 router.get('/test-data', async (req, res) => {
   try {
-    const data = await SensorData.find();
+    const data = await TestSensorData.find();
     res.json(data);
   } catch (err) {
     res.status(500).json({ message: err.message });

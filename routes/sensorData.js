@@ -1,4 +1,3 @@
-// routes/sensorData.js
 const express = require('express');
 const router = express.Router();
 const SensorData = require('../models/SensorData');
@@ -23,6 +22,13 @@ router.post('/data', async (req, res) => {
     tds: req.body.tds,
     temperature: req.body.temperature,
     salinity: req.body.salinity,
+
+    Month: req.body.Month,
+    Day: req.body.Day,
+    Year: req.body.Year,
+    Hour: req.body.Hour,
+    Minute: req.body.Minute,
+    Second: req.body.Second,
   });
 
   try {
@@ -52,6 +58,13 @@ router.post('/test-data', async (req, res) => {
     tds: req.body.tds,
     temperature: req.body.temperature,
     salinity: req.body.salinity,
+
+    Month: req.body.Month,
+    Day: req.body.Day,
+    Year: req.body.Year,
+    Hour: req.body.Hour,
+    Minute: req.body.Minute,
+    Second: req.body.Second,
   });
 
   try {

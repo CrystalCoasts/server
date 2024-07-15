@@ -1,4 +1,3 @@
-// models/SensorData.js
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -13,7 +12,13 @@ const sensorDataSchema = new Schema({
   temperature: Number,
   salinity: Number,
   tds: Number,
-  
+
+  Month: String,
+  Day: Number,
+  Year: Number,
+  Hour: Number,
+  Minute: Number,
+  Second: Number,
 });
 
 module.exports = mongoose.model('SensorData', sensorDataSchema);
